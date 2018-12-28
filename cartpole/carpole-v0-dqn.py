@@ -37,26 +37,6 @@ plt.ion()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-# In[3]:
-
-
-# Simple CartPole env taking random actions for ~40 episodes 
-# env.reset()
-# episode = 1
-# for _ in range(1000):
-#     env.render()
-#     observ, reward, done, info = env.step(env.action_space.sample()) # take a random action
-#     if done:
-#         print('Episode {}'.format(episode))
-#         episode += 1
-#         env.reset()
-# print('Finished')
-# env.close()
-
-
-# In[4]:
-
-
 Transition = namedtuple('Transition',
                         ('state', 'action', 'next_state', 'reward'))
 
@@ -154,11 +134,11 @@ def get_screen():
 
 
 env.reset()
-plt.figure()
-plt.imshow(get_screen().cpu().squeeze(0).permute(1, 2, 0).numpy(),
-           interpolation='none')
-plt.title('Example extracted screen')
-plt.show()
+# plt.figure()
+# plt.imshow(get_screen().cpu().squeeze(0).permute(1, 2, 0).numpy(),
+#            interpolation='none')
+# plt.title('Example extracted screen')
+# plt.show()
 
 
 # In[7]:
@@ -207,52 +187,52 @@ def select_action(state):
 episode_durations = []
 rewards = []
     
-def plot_durations():
-    plt.figure(1)
-#     plt.clf()
-    durations_t = torch.tensor(episode_durations, dtype=torch.float)
-    plt.title('Training...')
-    plt.xlabel('Episode')
-    plt.ylabel('Duration')
-    plt.plot(durations_t.numpy())
-    # Take 100 episode averages and plot them too
-#     if len(durations_t) >= 100:
-#         means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
-#         means = torch.cat((torch.zeros(99), means))
-#         plt.plot(means.numpy())
-
-    plt.pause(1)  # pause a bit so that plots are updated
-    if is_ipython:
-        display.clear_output(wait=True)
-        display.display(plt.gcf())
-
-def plot_reward():
+# def plot_durations():
 #     plt.figure(1)
-    plt.clf()
-    rewards_t = torch.tensor(rewards, dtype=torch.float)
-    plt.title('Training...')
-    plt.xlabel('Episode')
-    plt.ylabel('Reward')
-    plt.plot(rewards_t.numpy())
-    display.clear_output(wait=True)
-    plt.pause(1)  # pause a bit so that plots are updated
-        
+# #     plt.clf()
+#     durations_t = torch.tensor(episode_durations, dtype=torch.float)
+#     plt.title('Training...')
+#     plt.xlabel('Episode')
+#     plt.ylabel('Duration')
+#     plt.plot(durations_t.numpy())
+#     # Take 100 episode averages and plot them too
+# #     if len(durations_t) >= 100:
+# #         means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
+# #         means = torch.cat((torch.zeros(99), means))
+# #         plt.plot(means.numpy())
 
-def plot_reward_duration():
-    fig = plt.figure(figsize=(10, 20))
-    ax = fig.add_subplot(5, 2, 1)
-    durations_t = torch.tensor(episode_durations, dtype=torch.float)
-    plt.title('Training...')
-    plt.xlabel('Episode')
-    plt.ylabel('Duration')
-    plt.plot(durations_t.numpy())
-    
-#     ax = fig.add_subplot(5, 2, 3)
+#     plt.pause(1)  # pause a bit so that plots are updated
+#     if is_ipython:
+#         display.clear_output(wait=True)
+#         display.display(plt.gcf())
+
+# def plot_reward():
+# #     plt.figure(1)
+#     plt.clf()
 #     rewards_t = torch.tensor(rewards, dtype=torch.float)
+#     plt.title('Training...')
 #     plt.xlabel('Episode')
 #     plt.ylabel('Reward')
 #     plt.plot(rewards_t.numpy())
-#     plt.pause(1)
+#     display.clear_output(wait=True)
+#     plt.pause(1)  # pause a bit so that plots are updated
+        
+
+# def plot_reward_duration():
+#     fig = plt.figure(figsize=(10, 20))
+#     ax = fig.add_subplot(5, 2, 1)
+#     durations_t = torch.tensor(episode_durations, dtype=torch.float)
+#     plt.title('Training...')
+#     plt.xlabel('Episode')
+#     plt.ylabel('Duration')
+#     plt.plot(durations_t.numpy())
+    
+# #     ax = fig.add_subplot(5, 2, 3)
+# #     rewards_t = torch.tensor(rewards, dtype=torch.float)
+# #     plt.xlabel('Episode')
+# #     plt.ylabel('Reward')
+# #     plt.plot(rewards_t.numpy())
+# #     plt.pause(1)
 
 
 # In[8]:
@@ -306,8 +286,8 @@ def optimize_model():
 # In[ ]:
 
 
-get_ipython().run_line_magic('matplotlib', 'inline')
-num_episodes = 400
+# get_ipython().run_line_magic('matplotlib', 'inline')
+num_episodes = 5
 for i_episode in range(num_episodes):
     # Initialize the environment and state
     env.reset()
@@ -343,7 +323,7 @@ for i_episode in range(num_episodes):
             rewards.append(ep_reward)
 #             plot_reward_duration()
 #             plot_durations()
-            plot_reward()
+            # plot_reward()
             print("Episode: {}  Reward: {}".format(i_episode, ep_reward))
             break
     # Update the target network, copying all weights and biases in DQN
@@ -351,36 +331,36 @@ for i_episode in range(num_episodes):
         target_net.load_state_dict(policy_net.state_dict())
 
 print('Complete')
-env.render()
-env.close()
-plt.ioff()
-plt.show()
+# env.render()
+# env.close()
+# plt.ioff()
+# plt.show()
 
 
 # In[ ]:
 
 
-frames = []
-for i in range(100):
-    env.reset()
-    last_screen = get_screen()
-    current_screen = get_screen()
-    state = current_screen - last_screen
-    done = False
-    R = 0
-    t = 0
-    while not done and t < 200:
-        frames.append(env.render(mode = 'rgb_array'))
-        action = select_action(state)
-        obs, r, done, _ = env.step(action.item())
-        R += r
-        t += 1
-        if not done:
-            next_state = current_screen - last_screen
-        else:
-            next_state = None
-        state = next_state
-    print('test episode:', i, 'R:', R)
-env.render()
-env.close()
+# frames = []
+# for i in range(100):
+#     env.reset()
+#     last_screen = get_screen()
+#     current_screen = get_screen()
+#     state = current_screen - last_screen
+#     done = False
+#     R = 0
+#     t = 0
+#     while not done and t < 200:
+#         frames.append(env.render(mode = 'rgb_array'))
+#         action = select_action(state)
+#         obs, r, done, _ = env.step(action.item())
+#         R += r
+#         t += 1
+#         if not done:
+#             next_state = current_screen - last_screen
+#         else:
+#             next_state = None
+#         state = next_state
+#     print('test episode:', i, 'R:', R)
+# env.render()
+# env.close()
 
